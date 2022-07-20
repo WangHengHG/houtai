@@ -33,16 +33,17 @@ Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-//引入相关API请求接口
+// 引入相关API请求接口
 import API from '@/api';
-//组件实例的原型的原型指向的是Vue.prototype
-//任意组件都能使用到相关接口
-Vue.prototype.$API = API
+// 组件实例的原型的原型指向的是Vue.prototype
+// 任意组件都能使用到相关接口
+Vue.prototype.$API = API;
 new Vue({
   el: '#app',
   router,
   store,
   render: h => h(App)
+  
 })
