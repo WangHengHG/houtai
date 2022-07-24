@@ -55,7 +55,7 @@
         -->
         <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
         <!-- form: 表单 -->
-            <el-form :model="form">
+            <el-form :model="form" style="width:80%">
                 <el-form-item label="品牌名称" label-width="100px">
                 <el-input autocomplete="off"></el-input>
                 </el-form-item>
