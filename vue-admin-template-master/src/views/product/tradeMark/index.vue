@@ -54,15 +54,32 @@
         :visible.sync: 控制对话框显示与隐藏用的
         -->
         <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
-        <!-- form: 表单 -->
-            <el-form :model="form" style="width:80%">
+        <!-- form: 表单  :model属性, 这个属性的作用是, 把表单的数据收集到哪个对象的身上, 将来elementUI需要表单验证, 需要这个属性 -->
+            <el-form :model="tmForm" style="width:80%">
                 <el-form-item label="品牌名称" label-width="100px">
-                <el-input autocomplete="off"></el-input>
+                    <el-input v-model="tmForm.tmName" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="品牌LOGO" label-width="100px">
+                    <!-- 这里收集数据不能使用v-model, 因为不是表单元素
+                        action: 设置图片上传的地址
+                        on-success: 可以检测到图片上传成功, 当图片上传成功会执行一次
+                        before-upload: 上传图片之前会执行一次
+                    -->
+                    <el-upload
+                        class="avatar-uploader"
+                        action="/dev-api/admin/product/fileUpload"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                        <img v-if="tmForm.logoUrl" :src="tmForm.logoUrl" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                <el-button type="primary" @click="addOrUpdataTradeMark">确 定</el-button>
             </div>
          </el-dialog>
     </div>
@@ -82,12 +99,20 @@ export default {
             list: [],
             //对话框显示与隐藏控制的属性
             dialogFormVisible: false,
+            //收集品牌的信息, 对象身上的属性, 不能瞎写
+            tmForm: {
+                logoUrl: '',
+                tmName: '',
+                id: ''
+            }
         };
     },
     // 组件挂载完毕发请求
     mounted() {
         // 获取列表数据的方法
         this.getPageList();
+        // 上传图片相关的回调
+        
     },
     methods: {
         // 获取品牌列表的数据
@@ -109,14 +134,69 @@ export default {
         //点击添加品牌的按钮
         showDialog(){
             this.dialogFormVisible=true
+            //清除数据
+            this.tmForm = {tmName:'', logoUrl:''}
         },
         //修改某一个品牌
         updateTradeMark(){
             this.dialogFormVisible=true
 
+        },
+        //图片上传成功
+        handleAvatarSuccess(res, file) {
+            //res是上传成功之后, 返回给前端的数据
+            //file: 上传成功之后, 服务器返回给前端的数据
+            this.tmForm.logoUrl = res.data
+        },
+        //图片上传之前
+        beforeAvatarUpload(file) {
+            const isJPG = file.type === 'image/jpeg';
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            if (!isJPG) {
+            this.$message.error('上传头像图片只能是 JPG 格式!');
+            }
+            if (!isLt2M) {
+            this.$message.error('上传头像图片大小不能超过 2MB!');
+            }
+            return isJPG && isLt2M;
+        },
+        //添加按钮(添加品牌|修改品牌)
+        async addOrUpdataTradeMark(){
+            this.dialogFormVisible = false;
+            //发请求(添加|修改)
+            let result = await this.$API.trademark.reqAddOrUpdateTradeMark(this.tmForm);
+            if(result.code == 200) {
+                //弹出信息: 添加品牌成功, 修改品牌成功
+                this.$message(this.tmForm.id?'修改品牌成功':'添加品牌成功');
+                //添加或修改品牌成功之后, 需要再次获取品牌列表
+                this.getPageList();
+            }
         }
     },
 };
 </script>
-<style lang="">
+<style lang="less">
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
 </style>
