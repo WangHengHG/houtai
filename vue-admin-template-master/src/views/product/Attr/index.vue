@@ -1,11 +1,16 @@
 <template lang="">
     <div>
-        Attr
+        <CategorySelect>
+            
+        </CategorySelect>
+        <el-card>
+
+        </el-card>
     </div>
 </template>
 <script>
 export default {
-    name: Attr
+    name: 'Attr'
 }
 </script>
 <style lang="">
