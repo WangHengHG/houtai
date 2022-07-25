@@ -16,7 +16,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="三级分类">
-                    <el-select placeholder="请选择" v-model="cForm.category3Id">
+                    <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler3">
                         <el-option :label="c3.name" :value="c3.id" v-for="(c3, index) in list3" :key="c3.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -52,13 +52,20 @@
             async getCategory1List(){
                 let result = await this.$API.attr.reqCategorySelect1List(1);
                 if(result.code == 200) {
-                    this.list1 = result.data
+                    this.list1 = result.data;
+
                 }
             },
             //1级分类的select的事件的回调(当一级分类的option发生变化的时候, 获取相应二级分类的数据)
             async handler1(){
+                //清除数据
+                this.list2 = [];
+                this.list3 = [];
+                this.cForm.category2Id = '';
+                this.cForm.category3Id = '';
                 //解构出一级分类的ID
-                const {category1Id} = this.cForm
+                const {category1Id} = this.cForm;
+                this.$emit('getCategoryId', {categoryId: category1Id, level:1});
                 let result = await this.$API.attr.reqCategorySelect2List(category1Id);
                 if(result.code == 200) {
                     this.list2 = result.data
@@ -66,12 +73,22 @@
             },
             //2级分类的select的事件的回调(当二级分类的option发生变化的时候, 获取相应三级分类的数据)
             async handler2(){
+                //清除数据
+                this.list3 = [];
+                this.cForm.category3Id = '';
                 //解构出一级分类的ID
-                const {category2Id} = this.cForm
+                const {category2Id} = this.cForm;
+                this.$emit('getCategoryId', {categoryId: category2Id, level:2});
                 let result = await this.$API.attr.reqCategorySelect3List(category2Id);
                 if(result.code == 200) {
                     this.list3 = result.data
                 }
+            },
+            //3级分类的事件的回调
+            handler3(){
+                //获取3级分类的id
+                const {category3Id} = this.cForm;
+                this.$emit('getCategoryId', {categoryId: category3Id, level:3});
             }
         }
     }
