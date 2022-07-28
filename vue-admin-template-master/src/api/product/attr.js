@@ -23,4 +23,17 @@ export const reqCategorySelect3List = (category2Id)=> request({
 export const reqAttrList = (category1Id,category2Id,category3Id)=> request({
     url: `/admin/product/attrInfoList/${category1Id}/${category2Id}/${category3Id}`,
     method: 'get'
+});
+
+//添加属性与属性值的接口
+export const reqAddOrUpdateAttr = (data)=> request({
+    url: '/admin/product/saveAttrInfo',
+    method: 'post',
+    data
+});
+
+//删除属性的接口
+export const reqDeleteAttr = (attrId)=> request({
+    url: `/admin/product/deleteAttr/${attrId}`,
+    method: 'delete',
 })

@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        Spu
+        <CategorySelect ></CategorySelect>
     </div>
 </template>
 <script>
