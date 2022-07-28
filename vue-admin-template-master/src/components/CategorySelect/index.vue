@@ -3,25 +3,23 @@
         <!-- 三级联动
         inline: 代表的是行内表单: 一行可以放置多个表单元素
         -->
-        <el-card style="margin:20px 0px">
-            <el-form :inline="true" class="demo-form-inline" :model="cForm">
-                <el-form-item label="一级分类">
-                    <el-select placeholder="请选择" v-model="cForm.category1Id" @change="handler1" :disabled="show">
-                        <el-option :label="c1.name" :value="c1.id" v-for="(c1, index) in list1" :key="c1.id"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="二级分类">
-                    <el-select placeholder="请选择" v-model="cForm.category2Id" @change="handler2" :disabled="show">
-                        <el-option :label="c2.name" :value="c2.id" v-for="(c2, index) in list2" :key="c2.id"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="三级分类">
-                    <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler3" :disabled="show">
-                        <el-option :label="c3.name" :value="c3.id" v-for="(c3, index) in list3" :key="c3.id"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-        </el-card>
+        <el-form :inline="true" class="demo-form-inline" :model="cForm">
+            <el-form-item label="一级分类">
+                <el-select placeholder="请选择" v-model="cForm.category1Id" @change="handler1" :disabled="show">
+                    <el-option :label="c1.name" :value="c1.id" v-for="(c1, index) in list1" :key="c1.id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="二级分类">
+                <el-select placeholder="请选择" v-model="cForm.category2Id" @change="handler2" :disabled="show">
+                    <el-option :label="c2.name" :value="c2.id" v-for="(c2, index) in list2" :key="c2.id"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="三级分类">
+                <el-select placeholder="请选择" v-model="cForm.category3Id" @change="handler3" :disabled="show">
+                    <el-option :label="c3.name" :value="c3.id" v-for="(c3, index) in list3" :key="c3.id"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
     </div>
 </template>
 
@@ -54,7 +52,6 @@
                 let result = await this.$API.attr.reqCategorySelect1List(1);
                 if(result.code == 200) {
                     this.list1 = result.data;
-
                 }
             },
             //1级分类的select的事件的回调(当一级分类的option发生变化的时候, 获取相应二级分类的数据)

@@ -1,6 +1,8 @@
 <template lang="">
     <div>
-        <CategorySelect @getCategoryId="getCategoryId" :show="!isShowTable"></CategorySelect>
+        <el-card style="margin: 20px 0px">
+            <CategorySelect @getCategoryId="getCategoryId" :show="!isShowTable"></CategorySelect>
+        </el-card>
         <el-card>
             <div v-show="isShowTable">
                 <el-button type="primary" icon="el-icon-plus" :disabled="!category3Id" @click="addAttr">添加属性</el-button>
