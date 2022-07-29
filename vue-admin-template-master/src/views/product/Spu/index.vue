@@ -29,7 +29,7 @@
 
                 </el-pagination>
             </div>
-            <spuForm v-show="scene==1">添加spu|修改spu</spuForm>
+            <spuForm v-show="scene==1" @changeScene="changeScene(0)" ref="spu">添加spu|修改spu</spuForm>
             <skuForm v-show="scene==2">添加sku</skuForm>
         </el-card>
     </div>
@@ -55,7 +55,7 @@ export default {
             limit: 3,
             records: [],//spu列表的数据
             total: 0,//分页器一共需要展示数据的条数
-            scene: 1, //0代表展示spu列表的数据, 1: 展示添加或者修改spu  2: 添加sku
+            scene: 0, //0代表展示spu列表的数据, 1: 展示添加或者修改spu  2: 添加sku
         }
     },
     methods: {
@@ -106,8 +106,16 @@ export default {
         //修改spu按钮的回调
         updataSpu(row){
             this.scene = 1;
+            //获取子组件SpuForm
+            //在父组件中可以通过$refs获取子组件等等
+            this.$refs.spu.initSpuData(row);
+        },
+        //自定义事件回调
+        changeScene(scene){
+            this.scene = scene;
         }
-    }
+    },
+
 }
 </script>
 <style lang="">

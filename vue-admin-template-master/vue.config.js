@@ -37,7 +37,7 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    // 配置代理跨域
+    // 配置代理跨域http://gmall-h5-api.atguigu.cn
     proxy: {
       "/dev-api": {
         target: "http://gmall-h5-api.atguigu.cn",
