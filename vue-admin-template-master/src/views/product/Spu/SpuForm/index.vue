@@ -15,7 +15,7 @@
           <el-form-item label="SPU图片">
               <!-- action: 上传的地址 list-type: 文件列表的类型  on-preview: 图片预览  on-remove: 删除图片会触发 file-list:照片墙需要展示的数据(数组: 数组里面的元素务必要有name, url属性) -->
                 <el-upload
-                    action="/dev-api/admin/product/fileUpload"
+                    action="/dev-api/admin/product/upload"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleRemove"
@@ -29,11 +29,12 @@
                 </el-dialog>
           </el-form-item>
           <el-form-item label="销售属性">
-                <el-select :placeholder="`还有${unSelectSaleAttr.length}未选择`" v-model="attrIdAndName">
+                <el-select :placeholder="`还有${unSelectSaleAttr.length}个未选择`" v-model="attrIdAndName">
                     <el-option v-for="(unSelect, index) in unSelectSaleAttr" :key="unSelectSaleAttr.id" :label="unSelect.name" :value="`${unSelect.id}: ${unSelect.name}`"></el-option>
                 </el-select>
                 <el-button type="primary"icon="el-icon-plus" :disabled="!attrIdAndName" @click="addSaleAttr">添加销售属性</el-button>
                 <!-- 展示的是当前spu属于自己的销售属性 -->
+                {{this.unSelectSaleAttr}}
                 <el-table style="width: 100%" border :data="spu.spuSaleAttrList">
                     <el-table-column label="序号" width="80" type="index" align="center" ></el-table-column>
                     <el-table-column label="属性名" prop="saleAttrName"></el-table-column>
@@ -41,10 +42,9 @@
                         <template slot-scope="{row, $index}">
                             <el-tag
                                 :key="tag.id"
-                                v-for="(tag, index) in row.spuSaleAttrValueList""
+                                v-for="(tag, index) in row.spuSaleAttrValueList"
                                 closable
-                                :disable-transitions="false"
-                                >
+                                :disable-transitions="false">
                                 {{tag.saleAttrValueName}}
                             </el-tag>
                             <!--  -->
@@ -55,9 +55,9 @@
                                 ref="saveTagInput"
                                 size="small"
                                 @keyup.enter.native="handleInputConfirm"
-                                @blur="handleInputConfirm">
+                                @blur="handleInputConfirm(row)">
                             </el-input>
-                            <el-button v-else class="button-new-tag" size="small" >添加</el-button>
+                            <el-button v-else class="button-new-tag" size="small" @click="addSaleAttrValue(row)">添加</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
@@ -181,25 +181,61 @@ export default {
             //已经收集到了需要添加的销售属性的信息
             const [baseSaleAttrId, saleAttrName] = this.attrIdAndName.split(':');
             //想spu对象的spuSaleAttrList数组当中添加新的销售属性
-            let newSaleAttr = {baseSaleAttrId, saleAttrName, spuSaleAttrValueList: [],};
+            let newSaleAttr = {baseSaleAttrId, saleAttrName, spuSaleAttrValueList: []};
             //添加新的销售属性
             this.spu.spuSaleAttrList.push(newSaleAttr);
+            //清空数据
+            this.attrIdAndName = '';
+        },
+        //添加按钮的回调
+        addSaleAttrValue(row){
+            this.$set(row, 'inputVisible', true);
+            //通过响应式数据inputValue字段收集新增的销售属性值
+            this.$set(row, 'inputValue', '');
+        },
+        //el-input失去焦点的事件
+        handleInputConfirm(row){
+            //结构出销售属性当中收集的数据
+            const {baseSaleAttrId, inputValue} = row;
+            //新增的销售属性之不能为空
+            if(inputValue.trim() == ''){
+                this.$message('属性值不能为空');
+                this.$set(row, 'inputVisible', false);
+                return
+            };
+            //属性值不能重复
+            let result = row.spuSaleAttrValueList.some(item=> {
+                return item.saleAttrValueName == inputValue
+            });
+            if(result) {
+                this.$message('属性值重复');
+                return
+            };
+            //新增的销售属性值
+            let newSaleAttrValue = {
+                baseSaleAttrId,
+                inputValue,
+                saleAttrValueName: inputValue,
+            };
+
+            row.spuSaleAttrValueList.push(newSaleAttrValue)
+            this.$set(row, 'inputVisible', false);    
 
         }
     },
     mounted() {
-        console.log(11);
     },
     computed: {
         //计算出还未选择的销售属性
         unSelectSaleAttr(){
             //数组的过滤方法, 可以从已有的数组当中过滤出用户需要的元素, 并且返回一个新的数组
-            return this.saleAttrList.filter(item=> {
+            let result =  this.saleAttrList.filter(item=> {
                 // every: 数组的方法, 返回布尔值
                 return this.spu.spuSaleAttrList.every(item1=>{
-                    return item.name != item1.saleAttrName
+                    return item1.saleAttrName != item.name;
                 })
-            })
+            });
+            return result;
         }
     }
 };

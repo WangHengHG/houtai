@@ -68,7 +68,7 @@
                     -->
                     <el-upload
                         class="avatar-uploader"
-                        action="/dev-api/admin/product/fileUpload"
+                        action="/dev-api/admin/product/upload"
                         :show-file-list="false"
                         :on-success="handleAvatarSuccess"
                         :before-upload="beforeAvatarUpload">
@@ -113,7 +113,7 @@ export default {
                 tmName: [
                     { required: true, message: '请输入品牌名称', trigger: 'blur' },
                     //min: 品牌名称长度 
-                    { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'change' }
+                    { min: 2, max: 60, message: '长度在 2 到 10 个字符', trigger: 'change' }
                 ],
                 //品牌logo的验证规则
                 logoUrl: [
