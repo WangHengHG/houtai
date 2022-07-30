@@ -16,7 +16,7 @@
                     <el-table-column label="操作">
                         <template slot-scope="{row, $index}">
                             <!-- 这里的按钮将来用hintButton -->
-                            <hint-button type="success" icon="el-icon-plus" size="mini" title="添加sku"></hint-button>
+                            <hint-button type="success" icon="el-icon-plus" size="mini" title="添加sku" @click="addSku(row)"></hint-button>
                             <hint-button type="warning" icon="el-icon-edit" size="mini" title="修改spu"  @click="updataSpu(row)"></hint-button>
                             <hint-button type="info" icon="el-icon-info" size="mini" title="查看当前spu全部sku列表"></hint-button>
                             <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="deleteSpu(row)">
@@ -34,7 +34,7 @@
                 </el-pagination>
             </div>
             <spuForm v-show="scene==1" @changeScene="changeScene" ref="spu">添加spu|修改spu</spuForm>
-            <skuForm v-show="scene==2">添加sku</skuForm>
+            <skuForm v-show="scene==2" @changeScene="changeScene" ref="sku">添加sku</skuForm>
         </el-card>
     </div>
 </template>
@@ -105,6 +105,7 @@ export default {
         //添加spu按钮的回调
         addSpu(){
             this.scene = 1;
+
             //通知子组件SPUForm发请求--两个
             this.$refs.spu.addSpuData(this.category3Id);
         },
@@ -129,10 +130,17 @@ export default {
         async deleteSpu(row){
             let result = await this.$API.spu.reqDeleteSpu(row.id);
             if(result.code == 200) {
-                console.log(row);
                 this.$message({type:'success', message:'删除成功'});
-                this.getSpuList();
+                //代表spu个数大于1删除的时候停留在当前页, 如果spu 的个数小于1, 回到上一页
+                this.getSpuList(this.records.length > 1? this.page: this.page - 1);
             }
+        },
+        //添加sku按钮的回调
+        addSku(row){
+            //切换场景为2
+            this.scene = 2;
+            //父组件调用子组件的方法, 让子组件发请求 --三个请求
+            this.$refs.sku.getData(this.category1Id, this.category2Id,row);
         }
     },
 

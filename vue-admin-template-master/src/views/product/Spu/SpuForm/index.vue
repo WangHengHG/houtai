@@ -256,7 +256,7 @@ export default {
         //点击添加spu按钮的时候发请求的函数
         async addSpuData(category3Id){
             //获取品牌的信息
-            let tradeMarkResult = await this.$API.spu.reqTradeMarkList();
+            let tradeMarkResult = await this.$API.spu.reqTradeMarkList(category3Id);
             if (tradeMarkResult.code == 200) {
                 this.tradeMarkList = tradeMarkResult.data;
             };
