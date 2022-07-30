@@ -2,7 +2,7 @@
     <div>
         <el-card style="margin: 20px 0px">
             <!-- 三级联动已经是全局组件了 -->
-           <CategorySelect @getCategoryId="getCategoryId" :show="!isShowTable"></CategorySelect>
+           <CategorySelect @getCategoryId="getCategoryId" :show="scene != 0"></CategorySelect>
         </el-card>
         <el-card>
             <!-- 底部这里将来是由三部分切换的 -->
@@ -19,7 +19,11 @@
                             <hint-button type="success" icon="el-icon-plus" size="mini" title="添加sku"></hint-button>
                             <hint-button type="warning" icon="el-icon-edit" size="mini" title="修改spu"  @click="updataSpu(row)"></hint-button>
                             <hint-button type="info" icon="el-icon-info" size="mini" title="查看当前spu全部sku列表"></hint-button>
-                            <hint-button type="danger" icon="el-icon-delete" size="mini" title="删除当前spu"></hint-button>
+                            <el-popconfirm title="这是一段内容确定删除吗？" @onConfirm="deleteSpu(row)">
+                                <hint-button type="danger" icon="el-icon-delete" size="mini" title="删除当前spu" slot="reference">
+                                </hint-button>
+                            </el-popconfirm>
+                            
                         </template>
                     </el-table-column>
                 </el-table>
@@ -29,7 +33,7 @@
 
                 </el-pagination>
             </div>
-            <spuForm v-show="scene==1" @changeScene="changeScene(0)" ref="spu">添加spu|修改spu</spuForm>
+            <spuForm v-show="scene==1" @changeScene="changeScene" ref="spu">添加spu|修改spu</spuForm>
             <skuForm v-show="scene==2">添加sku</skuForm>
         </el-card>
     </div>
@@ -83,7 +87,6 @@ export default {
             //携带三个参数: page: 第几页  limit: 每一页需要展示多少条数据  三级分类ID
             const {page, limit, category3Id} = this;
             let result = await this.$API.spu.reqSpuList(page, limit, category3Id);
-            console.log(result);
             if(result.code==200){
                 this.total = result.data.total;
                 this.records = result.data.records;
@@ -102,6 +105,8 @@ export default {
         //添加spu按钮的回调
         addSpu(){
             this.scene = 1;
+            //通知子组件SPUForm发请求--两个
+            this.$refs.spu.addSpuData(this.category3Id);
         },
         //修改spu按钮的回调
         updataSpu(row){
@@ -111,8 +116,23 @@ export default {
             this.$refs.spu.initSpuData(row);
         },
         //自定义事件回调
-        changeScene(scene){
+        changeScene({scene, flag}){
             this.scene = scene;
+            //flag这个形参是为了区分保存按钮是添加还是修改
+            if(flag == '修改') {
+                this.getSpuList(this.page);
+            }else {
+                this.getSpuList();
+            }
+        },
+        //删除spu的按钮回调
+        async deleteSpu(row){
+            let result = await this.$API.spu.reqDeleteSpu(row.id);
+            if(result.code == 200) {
+                console.log(row);
+                this.$message({type:'success', message:'删除成功'});
+                this.getSpuList();
+            }
         }
     },
 

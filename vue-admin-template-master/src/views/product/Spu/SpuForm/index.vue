@@ -6,7 +6,7 @@
           </el-form-item>
           <el-form-item label="品牌">
               <el-select placeholder="请选择品牌" v-model="spu.tmId">
-                  <el-option  v-for="(tradeMark, index) in tradeMarkList" :key="index" :value="tradeMark.tmName"></el-option>
+                  <el-option  v-for="(tradeMark, index) in tradeMarkList" :key="index" :value="tradeMark.id" :label="tradeMark.tmName"></el-option>
               </el-select>
           </el-form-item>
           <el-form-item label="SPU描述">
@@ -34,7 +34,7 @@
                 </el-select>
                 <el-button type="primary"icon="el-icon-plus" :disabled="!attrIdAndName" @click="addSaleAttr">添加销售属性</el-button>
                 <!-- 展示的是当前spu属于自己的销售属性 -->
-                {{this.unSelectSaleAttr}}
+                
                 <el-table style="width: 100%" border :data="spu.spuSaleAttrList">
                     <el-table-column label="序号" width="80" type="index" align="center" ></el-table-column>
                     <el-table-column label="属性名" prop="saleAttrName"></el-table-column>
@@ -44,8 +44,9 @@
                                 :key="tag.id"
                                 v-for="(tag, index) in row.spuSaleAttrValueList"
                                 closable
-                                :disable-transitions="false">
+                                :disable-transitions="false" @close="row.spuSaleAttrValueList.splice(index, 1)">
                                 {{tag.saleAttrValueName}}
+                                
                             </el-tag>
                             <!--  -->
                             <el-input
@@ -61,15 +62,15 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
-                        <template>
-                            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+                        <template slot-scope="{row, $index}">
+                            <el-button type="danger" icon="el-icon-delete" size="mini" @click="spu.spuSaleAttrList.splice($index, 1)"></el-button>
                         </template>
                     </el-table-column>
                 </el-table>
           </el-form-item>
           <el-form-item>
-              <el-button type="primary">保存</el-button>
-              <el-button @click="$emit('changeScene', 0)">取消</el-button>
+              <el-button type="primary" @click="addOrUpdataSpu">保存</el-button>
+              <el-button @click="cancel">取消</el-button>
           </el-form-item>
         </el-form>
     </div>
@@ -83,7 +84,7 @@ export default {
             //存储spu信息属性, 初始化的时候是一个空的对象, 在修改spu的时候, 会向服务器发请求, 返回spu信息, 在修改的时候可以利用服务器返回的这个对象收集最新的数据提交给服务器
             //添加spu, 如果是添加spu的时候并没有向服务器发请求, 数据收集到哪里[spu],
             spu: {
-                category3Id: 0,
+                category3Id: '',
                 //描述
                 description: "",
                 //手机spu图片的信息
@@ -117,7 +118,7 @@ export default {
                     // }
                 ],
                 //品牌的id
-                tmId: 0,
+                tmId: '',
             },
             tradeMarkList: [], //存储品牌信息
             spuImageList: [], //存储spu图片的数据
@@ -148,7 +149,7 @@ export default {
                 this.spu = SpuInfoResult.data;
             }
             //获取品牌的信息
-            let tradeMarkResult = await this.$API.spu.reqTradeMarkList();
+            let tradeMarkResult = await this.$API.spu.reqTradeMarkList(this.spu.category3Id);
             if (tradeMarkResult.code == 200) {
                 this.tradeMarkList = tradeMarkResult.data;
             }
@@ -221,7 +222,53 @@ export default {
             row.spuSaleAttrValueList.push(newSaleAttrValue)
             this.$set(row, 'inputVisible', false);    
 
+        },
+        handlerClose(tag){
+            console.log(11, tag);
+        },
+        //点击取消离开修改扩折添加界面
+        cancel(){
+            //取消按钮的回调, 通知父模块切换场景为0
+            this.$emit('changeScene', {scene: 0, flag: ''});
+            //组件实例的this._data, 可以操作data当中的响应式的数据
+            //this.$options可以获取配置对象, 配置对象的data函数执行, 返回的响应式数据为空的
+            Object.assign(this._data, this.$options.data())
+        },
+
+        //保存按钮的回调
+        async addOrUpdataSpu(){
+            //整理参数: 需要整理照片墙的数据
+            //携带参数: 对于图片: 携带imgName和imgUrl两个字段
+            this.spu.spuImageList = this.spuImageList.map(item=> {
+                return {
+                    imgName: item.name,
+                    imgUrl: (item.response&&item.response.data)||item.url
+                }
+            });
+            let result = await this.$API.spu.reqAddOrUpdataSpu(this.spu);
+            if(result.code == 200) {
+                this.$message({type:'success', message:'保存成功'});
+                this.$emit('changeScene', {scene: 0, flag:this.spu.id?'修改':'添加'});
+            };
+            //清除数据
+            Object.assign(this._data, this.$options.data())
+        },
+        //点击添加spu按钮的时候发请求的函数
+        async addSpuData(category3Id){
+            //获取品牌的信息
+            let tradeMarkResult = await this.$API.spu.reqTradeMarkList();
+            if (tradeMarkResult.code == 200) {
+                this.tradeMarkList = tradeMarkResult.data;
+            };
+            //获取平台所有销售属性
+            let saleResult = await this.$API.spu.reqBaseSaleAttrList();
+            if (saleResult.code == 200) {
+                this.saleAttrList = saleResult.data;
+            };
+            //添加spu的时候收集category3Id
+            this.spu.category3Id = category3Id;
         }
+
     },
     mounted() {
     },
