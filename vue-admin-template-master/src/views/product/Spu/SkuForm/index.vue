@@ -135,7 +135,7 @@ export default {
     },
     methods: {
         cancel(){
-            this.$emit('changeScene', {scene: 0, flag: ''});
+            this.$emit('changeScenes', 0);
             Object.assign(this._data, this.$options.data())
         },
         //获取skuForm数据
@@ -205,7 +205,6 @@ export default {
             skuInfo.skuAttrValueList = attrInfoList.reduce((prev, item)=> {
                 if(item.attrIdAndAttrValueId){
                     const [attrId, valueId] = item.attrIdAndAttrValueId.split(':');
-                    console.log(valueId);
                     prev.push({attrId, valueId})
                 }
                 return prev;
@@ -229,7 +228,11 @@ export default {
             });
             //发请求
             let reqResult = await this.$API.spu.reqAddSku(skuInfo);
-            console.log(reqResult);
+            if(reqResult.code == 200) {
+                this.$emit('changeScenes', 0);
+                this.$message({type: 'success', message: '保存成功!'});
+                Object.assign(this._data, this.$options.data());
+            }
 
         }
     }
