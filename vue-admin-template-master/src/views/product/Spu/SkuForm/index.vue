@@ -24,7 +24,7 @@
                 <el-form :inline="true">
                     <el-form-item :label="attr.attrName" v-for="(attr, index) in attrInfoList" :key="attr.id">
                         <el-select placeholder="请选择" v-model="attr.attrIdAndAttrValueId">
-                            <el-option :label="attrValue.valueName" :value="`${attr.id}:${attrValue.id}}`" v-for="(attrValue, index) in attr.attrValueList" :key="attrValue.id"></el-option>
+                            <el-option :label="attrValue.valueName" :value="`${attr.id}:${attrValue.id}`" v-for="(attrValue, index) in attr.attrValueList" :key="attrValue.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-form>
@@ -38,6 +38,7 @@
                     </el-form-item>
                 </el-form>
             </el-form-item>
+            
             <el-form-item label="图片列表">
                 <el-table border :data="spuImageList" @selection-change="handleSelectionChange">
                     <el-table-column width="80" type="selection" ></el-table-column>
@@ -156,7 +157,6 @@ export default {
             //获取销售属性的数据
             let result1 = await this.$API.spu.reqSpuSaleAttrList(spu.id);
             if(result.code == 200) {
-                console.log(result1);
                 this.spuSaleAttrList = result1.data;
             };
             //获取平台属性的数据
@@ -202,14 +202,14 @@ export default {
             //将整理好的参数赋值给skuInfo.skuAttrValueList
             
             //整理平台数据的方式2
-            let result = attrInfoList.reduce((prev, item)=> {
+            skuInfo.skuAttrValueList = attrInfoList.reduce((prev, item)=> {
                 if(item.attrIdAndAttrValueId){
                     const [attrId, valueId] = item.attrIdAndAttrValueId.split(':');
+                    console.log(valueId);
                     prev.push({attrId, valueId})
                 }
                 return prev;
             },[]);
-            this.skuInfo.skuAttrValueList = result;
             //整理销售属性
             skuInfo.skuSaleAttrValueList = spuSaleAttrList.reduce((prev, item)=> {
                 if(item.saleAttrIdAndValueId){
