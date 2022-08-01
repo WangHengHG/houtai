@@ -36,8 +36,8 @@
             <spuForm v-show="scene==1" @changeScene="changeScene" ref="spu">添加spu|修改spu</spuForm>
             <skuForm v-show="scene==2" @changeScenes="changeScenes" ref="sku">添加sku</skuForm>
         </el-card>
-        <el-dialog :title="spu.spuName" :visible.sync="dialogTableVisible">
-            <el-table :data="skuList" border>
+        <el-dialog :title="spu.spuName" :visible.sync="dialogTableVisible" :before-close="handleClose">
+            <el-table :data="skuList" border v-loading="loading">
                 <el-table-column
                     header-align="center"
                     align="center"
@@ -94,6 +94,7 @@ export default {
       dialogTableVisible: false,//控制对话框的显示与隐藏
       spu: {},
       skuList: [], //sku列表的数据
+      loading: true,
     };
   },
   methods: {
@@ -189,11 +190,19 @@ export default {
         //获取sku列表的数据进行展示
         let result = await this.$API.spu.reqSkuList(spu.id);
         if(result.code == 200) {
-            this.skuList = result.data;
-
+          this.skuList = result.data;
+          this.loading = false;
         }
-    }
+    },
+    //关闭table的回调
+    //清空查看sku列表的数据
+    handleClose(done){
+      this.skuList = [];
+      this.loading = true;
+      done();
+    },
   },
+
 };
 </script>
 <style lang="">
