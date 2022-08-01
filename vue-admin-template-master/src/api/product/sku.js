@@ -7,13 +7,19 @@ export const reqSkuList = (page, limit)=> request({
 })
 
 //sku上架
-export const reqOnSale = ()=> request({
+export const reqOnSale = (skuId)=> request({
     url:`/admin/product/onSale/${skuId} `,
     method: 'get'
 })
 
 //sku下架
-export const reqCancelSale = ()=> request({
+export const reqCancelSale = (skuId)=> request({
     url:`/admin/product/cancelSale/${skuId} `,
+    method: 'get'
+})
+
+//获取sku详情的接口
+export const reqSkuById = (skuId)=> request({
+    url: `/admin/product/getSkuById/${skuId}`,
     method: 'get'
 })
