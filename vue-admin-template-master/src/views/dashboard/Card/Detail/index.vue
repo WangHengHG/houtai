@@ -35,7 +35,7 @@ export default {
         font-size: 30px;
     }
     .card-class {
-        height: 40px;
+        height: 50px;
     }
     .card-footer{
         border-top: 1px solid #eee;
