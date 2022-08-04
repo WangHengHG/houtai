@@ -18,6 +18,10 @@ export default {
     Sale,
     Observe
   },
+  mounted(){
+    //派发action
+    this.$store.dispatch('getData');
+  },
   computed: {
     ...mapGetters([
       'name'

@@ -3,37 +3,93 @@
         <div slot="header" class="header clearfix">
             <div class="category-header">
                 <span>销售额类别占比</span>
-                <el-radio-group v-model="value">
+                <el-radio-group v-model="value" class="radio">
                     <el-radio-button label="全部渠道"></el-radio-button>
                     <el-radio-button label="线上"></el-radio-button>
                     <el-radio-button label="门店"></el-radio-button>
                 </el-radio-group>
             </div>
         </div>
+        <div>
+            <div class="charts" ref="charts"></div>
+        </div>
     </el-card>
 </template>
 <script>
+import * as echarts from 'echarts';
 export default {
     data(){
         return {
             value: '全部渠道'
         }
+    },
+    mounted(){
+        //饼图
+        let myChart = echarts.init(this.$refs.charts);
+        myChart.setOption({
+            title: {
+                text: '视频',
+                subtext: 1049,
+                left: "center",
+                top: 'center'
+            },
+              tooltip: {
+                trigger: 'item'
+            },
+
+            series: [
+                {
+                name: 'Access From',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: true,
+                    position: 'outside'
+                },
+
+                labelLine: {
+                    show: true
+                },
+                data: [
+                    { value: 1048, name: '视频' },
+                    { value: 735, name: 'Direct' },
+                    { value: 580, name: 'Email' },
+                    { value: 484, name: 'Union Ads' },
+                    { value: 300, name: 'Video Ads' }
+                ]
+                }
+            ]
+        });
+        //绑定事件
+        myChart.on('mouseover', (params)=> {
+            //获取鼠标的那条数据
+            const {name, value} = params.data;
+            //重新设置标题
+            myChart.setOption({
+                title: {
+                    text: name,
+                    subtext: value,
+                },
+            })
+        });
     }
 }
 </script>
 <style lang="less" scoped>
     .box-card {
-    margin: 10px 0px;
-    .charts {
-        width: 100%;
-        height: 260px;
-    }
-    }
-    .herder {
+        .charts {
+            width: 100%;
+            height: 260px;
+        }
     }
     .category-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .radio {
+        position: absolute;
+        right: 10px;
     }
 </style>
