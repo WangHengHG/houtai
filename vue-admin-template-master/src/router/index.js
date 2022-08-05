@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-/* Layout */
+/* Layout引入最外层骨架的一级路由组件 */
 import Layout from '@/layout'
 
 /**
@@ -30,6 +30,12 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+// 路由的配置, 为什么不同的用户登录我们的项目, 菜单(路由) 都是一样的
+//因为路由都是固定的, 能看见的操作的菜单都是一样的
+//需要把项目中的路由进行拆分
+
+//常量路由: 不管用户是什么角色, 都可以看见
+//什么角色(超级管理员, 普通员工): 登录, 首页, 404
 export const constantRoutes = [
   {
     path: '/login',
@@ -54,6 +60,12 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     }]
   },
+
+
+]
+
+//异步路由: 不同的用户(角色), 需要过滤筛选出的路由, 称之为异步路由
+export const asyncRoutes = [
   {
     path: '/product',
     component: Layout,
@@ -89,13 +101,59 @@ export const constantRoutes = [
       },
     ]
   },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  //权限管理相关路由
+  {
+    path: '/acl',
+    name: 'Acl',
+    component: Layout,
+    meta: {
+      title: '权限管理',
+      icon: 'el-icon-suitcase'
+    },
+    children: [
+      {
+        path:'user/list',
+        name: 'User',
+        component: ()=> import('@/views/acl/user/list'),
+        meta: {
+          title: '用户管理'
+        }
+      },
+      {
+        path:'role/list',
+        name: 'Role',
+        component: ()=> import('@/views/acl/role/list'),
+        meta: {
+          title: '角色管理'
+        }
+      },
+      {
+        path: 'role/auth/:id',
+        component: ()=> import('@/views/acl/role/roleAuth'),
+        meta: {
+          title: '角色授权',
+          activeMenu: '/acl/role/list'
+        },
+        hidden: true
+      },
+      {
+        path: 'permission',
+        name: 'Permission',
+        component: ()=> import('@/views/acl/permission/list'),
+        meta: {
+          title:'菜单管理',
+        }
+      }
+    ]
+  },
 ]
+//任意路由: 路径发生错误的时候重定向404
+export const anyRoutes = { path: '*', redirect: '/404', hidden: true }
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
+  //如果路由根据不同的用户可以展示不同的菜单
   routes: constantRoutes
 })
 

@@ -12,6 +12,7 @@
         :collapse-transition="false"
         mode="vertical"
       >
+      <!-- 潘xx: 遍历菜单栏的时候都是常量路由 -->
         <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
     </el-scrollbar>
@@ -30,8 +31,10 @@ export default {
     ...mapGetters([
       'sidebar'
     ]),
+    //应该替换为仓库中计算好的全部路由
     routes() {
-      return this.$router.options.routes
+      //sliderbar: 需要遍历的应该是仓库计算完毕的全部路由
+      return this.$store.state.user.resultAllRoutes
     },
     activeMenu() {
       const route = this.$route
