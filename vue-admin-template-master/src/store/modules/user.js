@@ -4,7 +4,9 @@ import { login, logout, getInfo } from '@/api/user';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 //路由模块当中重置路由的方法
 import {anyRoutes, resetRouter, asyncRoutes, constantRoutes } from '@/router';
+console.log(asyncRoutes);
 import router from '@/router';
+import Router from 'vue-router';
 const getDefaultState = () => {
   return {
     token: getToken(),
@@ -27,7 +29,6 @@ const state = getDefaultState()
 
 //定义一个函数, 两个数组进行对比, 对比出当前的用户到底显示哪些异步路由
 const computedAsyncRoutes = (asyncRoutes, routes) => {
-
   //过滤出当前用户[超级管理员| 普通员工] 需要展示的异步路由
   return asyncRoutes.filter(item=> {
     //数组当中没有这个元素返回索引值-1, 如果有这个元素返回的索引值一定不是-1
@@ -63,6 +64,8 @@ const mutations = {
     //计算出当前用户需要展示所有路由
     state.resultAllRoutes = constantRoutes.concat(state.resultAsyncRoutes, anyRoutes)
     //给路由添加新的路由
+    // console.log(state.resultAllRoutes, '传送路由');
+    router.matcher = new Router().matcher;
     router.addRoutes(state.resultAllRoutes)
   }
 }
@@ -88,7 +91,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-        console.log(data);
         if (!data) {
           return reject('Verification failed, please Login again.')
         }

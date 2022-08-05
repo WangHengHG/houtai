@@ -129,6 +129,7 @@ export const asyncRoutes = [
       },
       {
         path: 'role/auth/:id',
+        name: 'RoleAuth',
         component: ()=> import('@/views/acl/role/roleAuth'),
         meta: {
           title: '角色授权',
@@ -144,6 +145,31 @@ export const asyncRoutes = [
           title:'菜单管理',
         }
       }
+    ]
+  },
+  //测试管理路由
+  {
+    path: '/test',
+    component: Layout,
+    name: 'Test',
+    meta: {
+      title: '测试管理',
+      icon: 'el-icon-goods'
+    },
+    children: [
+      {
+        path: 'test1',
+        name: 'Test1',
+        component: ()=> import('@/views/test/test1'),
+        meta: {title: '测试管理1'}
+      },
+      {
+        path: 'attr',
+        name: 'Attr',
+        component: ()=> import('@/views/test/test2'),
+        meta: {title: '测试管理2'}
+      },
+
     ]
   },
 ]
